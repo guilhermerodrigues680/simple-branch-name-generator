@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerador Nome Branch</title>
+  </head>
+  <body>
+    <h1>Gerador Nome Branch</h1>
+
+    <main x-data="appdata">
+      <section>
+        <label>
+          <span>Tipo da branch</span>
+          <select x-model="branchType">
+            <option value="" selected>Sem tipo</option>
+            <option value="feature">Feature</option>
+            <option value="improvement">Improvement</option>
+            <option value="bugfix">BugFix</option>
+            <option value="hotfix">HotFix</option>
+            <option value="release">Release</option>
+            <option value="script">Script</option>
+            <option value="documentation">Documentation</option>
+            <option value="test">Test</option>
+            <option value="cicd">CI/CD</option>
+            <option value="revert">Revert</option>
+            <option value="build">Build</option>
+          </select>
+        </label>
+
+        <label>
+          Work in progress (WIP):
+          <input type="checkbox" x-model="wipBranch" />
+        </label>
+
+        <br />
+
+        <label>
+          <span>Task ID ou URL</span>
+          <input type="text" x-model="taskIdOrUrl" />
+          <br />
+          <template x-if="!!taskIdOrUrlValidError">
+            <span>
+              Atenção:
+              <span x-text="taskIdOrUrlValidError"></span>
+            </span>
+          </template>
+        </label>
+
+        <template x-if="!!taskIdOrUrl">
+          <label>
+            <span>Tipo da tarefa</span>
+            <select x-model="taskType">
+              <option value="" selected>Sem tipo</option>
+              <option value="t" selected>Tarefa</option>
+              <option value="i">Issue</option>
+            </select>
+          </label>
+        </template>
+
+        <br />
+
+        <label>
+          <span>Descrição da branch</span>
+          <textarea x-model="branchDescription" cols="30" rows="3"></textarea>
+        </label>
+      </section>
+
+      <section>
+        <h2>Nome Branch:</h2>
+        <p>
+          <code x-text="branchName"></code>
+        </p>
+        <template x-if="!!taskId">
+          <p>
+            <b>Dica:</b> Você pode usar o Task ID em suas mensagens de commit,
+            ex:
+            <br />
+            <code>T #<span x-text="taskId"></span> - AAA BBB CCC</code>
+          </p>
+        </template>
+      </section>
+    </main>
+
+    <script type="module">
+      // @ts-check
+
+      // https://www.stefanjudis.com/today-i-learned/vs-code-supports-jsdoc-powered-type-checking/
+
+      import Alpine from "https://cdn.jsdelivr.net/npm/alpinejs@3.13.2/dist/module.esm.js";
+      // import Alpine2 from "https://esm.run/alpinejs@3.13.2";
+      // import Alpine3 from 'https://cdn.skypack.dev/alpinejs@3.13.2';
+
+      /**
+       * @param {string} taskIdOrUrl
+       * @returns {string|null}
+       */
+      function extractTaskId(taskIdOrUrl) {
+        // 7677
+        // ou
+        // https://runrun.it/pt-BR/tasks/7677?isNew=true
+        const urlMatch = taskIdOrUrl.match(/\/tasks\/(\d+)/);
+        if (urlMatch) {
+          return urlMatch[1];
+        }
+
+        const taskIdMatch = taskIdOrUrl.match(/(\d+)/);
+        if (taskIdMatch) {
+          return taskIdMatch[1];
+        }
+
+        return null;
+      }
+
+      /**
+       * Remove os acentos de uma string, baseado em
+       * {@link https://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript}.
+       * @param {string} v
+       * @example
+       * removeAccents("Olá Mundo") // "Ola Mundo"
+       */
+      function removeAccents(v) {
+        const newV = v.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return newV;
+      }
+
+      /**
+       * Converte uma string para kebab-case
+       * @param {string} v
+       * @example
+       * kebabCase("Olá Mundo") // "ola-mundo"
+       */
+      function kebabCase(v) {
+        const newV = removeAccents(v)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)+/g, "");
+        return newV;
+      }
+
+      console.debug({ Alpine });
+
+      Alpine.data("appdata", () => ({
+        branchType: "",
+        wipBranch: false,
+        taskIdOrUrl: "",
+        taskType: "t",
+        branchDescription: "",
+
+        /** @type {string|null} */
+        get taskIdOrUrlValidError() {
+          const v = this.taskIdOrUrl.trim();
+          // O campo é opcional
+          if (!v) {
+            return null;
+          }
+
+          const taskId = extractTaskId(v);
+          if (!taskId) {
+            return "O texto informado não contém um Task ID válido";
+          }
+
+          return null;
+        },
+
+        /** @type {string|null} */
+        get taskId() {
+          return extractTaskId(this.taskIdOrUrl);
+        },
+
+        get branchName() {
+          const wipBranch = this.wipBranch ? "WIP/" : "";
+          const branchType = this.branchType ? `${this.branchType}/` : "";
+
+          const taskId = extractTaskId(this.taskIdOrUrl);
+          const taskIdOrUrl = taskId ? `${taskId}-` : "";
+          const taskType = !!taskId && this.taskType ? `${this.taskType}-` : "";
+
+          const branchDescription = this.branchDescription
+            ? kebabCase(this.branchDescription)
+            : "";
+
+          return `${wipBranch}${branchType}${taskType}${taskIdOrUrl}${branchDescription}`;
+        },
+
+        init() {
+          console.debug("init", { appdata: this });
+        },
+      }));
+
+      Alpine.start();
+    </script>
+  </body>
+</html>
