@@ -5,33 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gerador Nome Branch</title>
 
-    <!--
-      Trocada da versão 4.0.3 para 4.0.2, pois a 4.0.3 não estava
-      estilizando o elemento select:
-      https://github.com/saadeghi/daisyui/issues/2505
-    -->
-    <!-- <link
-      href="https://cdn.jsdelivr.net/npm/daisyui@4.0.3/dist/full.min.css"
-      rel="stylesheet"
-      type="text/css"
-    /> -->
     <link
-      href="https://cdn.jsdelivr.net/npm/daisyui@4.0.2/dist/full.min.css"
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.3.1/dist/full.min.css"
       rel="stylesheet"
       type="text/css"
     />
-    <script src="https://cdn.tailwindcss.com/3.3.5"></script>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <!-- <style>
-      /*
-        TODO: Entender porque select-bordered do daisyui 4.0.3, mesmo que no
-        arquivo full.css, não estilizou o elemento select, e essa copia sim.
-        A única alteração foi a remoção do `:where(select.select)-bordered`
-      */
-      .select-bordered {
-        border-color: var(--fallback-bc, oklch(var(--bc) / 0.2));
-      }
-    </style> -->
+    <script src="https://cdn.tailwindcss.com/3.3.5?plugins=typography@0.5.10"></script>
   </head>
   <body>
     <main
