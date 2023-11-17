@@ -4,15 +4,48 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gerador Nome Branch</title>
+
+    <!--
+      Trocada da versão 4.0.3 para 4.0.2, pois a 4.0.3 não estava
+      estilizando o elemento select:
+      https://github.com/saadeghi/daisyui/issues/2505
+    -->
+    <!-- <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.0.3/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    /> -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.0.2/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com/3.3.5"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <!-- <style>
+      /*
+        TODO: Entender porque select-bordered do daisyui 4.0.3, mesmo que no
+        arquivo full.css, não estilizou o elemento select, e essa copia sim.
+        A única alteração foi a remoção do `:where(select.select)-bordered`
+      */
+      .select-bordered {
+        border-color: var(--fallback-bc, oklch(var(--bc) / 0.2));
+      }
+    </style> -->
   </head>
   <body>
-    <h1>Gerador Nome Branch</h1>
+    <main
+      class="block w-full max-w-4xl mx-auto p-4 md:grid md:grid-cols-2 md:gap-y-4 md:gap-x-16 md:justify-items-center"
+      x-data="appdata"
+    >
+      <header class="prose md:col-span-2">
+        <h1>Gerador Nome Branch</h1>
+      </header>
 
-    <main x-data="appdata">
-      <section>
-        <label>
-          <span>Tipo da branch</span>
-          <select x-model="branchType">
+      <section class="prose mt-4 md:mt-0">
+        <label class="form-control w-full max-w-xs">
+          <span class="label label-text">Tipo da branch</span>
+          <select class="select select-bordered" x-model="branchType">
             <option value="" selected>Sem tipo</option>
             <option value="feature">Feature</option>
             <option value="improvement">Improvement</option>
@@ -28,29 +61,35 @@
           </select>
         </label>
 
-        <label>
-          Work in progress (WIP):
-          <input type="checkbox" x-model="wipBranch" />
+        <label class="label cursor-pointer w-full max-w-xs pb-0">
+          <span class="label-text"> Work in progress (WIP): </span>
+          <input class="checkbox" type="checkbox" x-model="wipBranch" />
         </label>
 
-        <br />
+        <br class="hidden" />
 
-        <label>
-          <span>Task ID ou URL</span>
-          <input type="text" x-model="taskIdOrUrl" />
-          <br />
+        <label class="form-control w-full max-w-xs">
+          <span class="label label-text">Task ID ou URL</span>
+          <input
+            class="input input-bordered"
+            type="text"
+            x-model="taskIdOrUrl"
+          />
+          <br class="hidden" />
           <template x-if="!!taskIdOrUrlValidError">
-            <span>
-              Atenção:
-              <span x-text="taskIdOrUrlValidError"></span>
+            <span class="label label-text-alt">
+              <span>
+                Atenção:
+                <span x-text="taskIdOrUrlValidError"></span>
+              </span>
             </span>
           </template>
         </label>
 
         <template x-if="!!taskIdOrUrl">
-          <label>
-            <span>Tipo da tarefa</span>
-            <select x-model="taskType">
+          <label class="form-control">
+            <span class="label label-text">Tipo da tarefa</span>
+            <select class="select select-bordered" x-model="taskType">
               <option value="" selected>Sem tipo</option>
               <option value="t" selected>Tarefa</option>
               <option value="i">Issue</option>
@@ -58,17 +97,22 @@
           </label>
         </template>
 
-        <br />
+        <br class="hidden" />
 
-        <label>
-          <span>Descrição da branch</span>
-          <textarea x-model="branchDescription" cols="30" rows="3"></textarea>
+        <label class="form-control w-full max-w-xs">
+          <span class="label label-text">Descrição da branch</span>
+          <textarea
+            class="textarea textarea-bordered leading-tight"
+            x-model="branchDescription"
+            cols="30"
+            rows="3"
+          ></textarea>
         </label>
       </section>
 
-      <section>
-        <h2>Nome Branch:</h2>
-        <p>
+      <section class="prose mt-6 md:mt-0">
+        <h2 class="md:mt-0">Nome Branch:</h2>
+        <p class="leading-none">
           <code x-text="branchName"></code>
         </p>
         <template x-if="!!taskId">
