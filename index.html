@@ -37,7 +37,7 @@
   </head>
   <body>
     <main
-      class="block w-full max-w-4xl mx-auto p-4 md:grid md:grid-cols-2 md:gap-y-4 md:gap-x-16"
+      class="block w-full max-w-lg mx-auto p-4 md:max-w-4xl md:grid md:grid-cols-2 md:gap-y-4 md:gap-x-16"
       x-cloak
       x-data="appdata"
     >
@@ -46,7 +46,7 @@
       </header>
 
       <section class="prose mt-4 md:mt-0 md:justify-self-center">
-        <label class="form-control w-full max-w-xs">
+        <label class="form-control">
           <span class="label label-text">Tipo da branch</span>
           <select class="select select-bordered" x-model="branchType">
             <option value="" selected>Sem tipo</option>
@@ -64,14 +64,14 @@
           </select>
         </label>
 
-        <label class="label cursor-pointer w-full max-w-xs pb-0">
+        <label class="label cursor-pointer pb-0">
           <span class="label-text"> Work in progress (WIP): </span>
           <input class="checkbox" type="checkbox" x-model="wipBranch" />
         </label>
 
         <br class="hidden" />
 
-        <label class="form-control w-full max-w-xs">
+        <label class="form-control">
           <span class="label label-text">Task ID ou URL</span>
           <input
             class="input input-bordered"
@@ -109,7 +109,7 @@
 
         <br class="hidden" />
 
-        <label class="form-control w-full max-w-xs">
+        <label class="form-control">
           <span class="label label-text">Descrição da branch</span>
           <textarea
             class="textarea textarea-bordered leading-tight"
