@@ -46,7 +46,8 @@
       </header>
 
       <section class="prose mt-4 md:mt-0 md:justify-self-center">
-        <label class="form-control">
+        <!-- TODO: Remover uso do código -->
+        <!-- <label class="form-control">
           <span class="label label-text">Tipo da branch</span>
           <select class="select select-bordered" x-model="branchType">
             <option value="" selected>Sem tipo</option>
@@ -69,10 +70,10 @@
           <input class="checkbox" type="checkbox" x-model="wipBranch" />
         </label>
 
-        <br class="hidden" />
+        <br class="hidden" /> -->
 
         <label class="form-control">
-          <span class="label label-text">Task ID ou URL</span>
+          <span class="label label-text">Work item Type e ID</span>
           <input
             class="input input-bordered"
             type="text"
@@ -89,8 +90,9 @@
           </template>
         </label>
 
-        <template x-if="!!taskIdOrUrl">
-          <!-- https://stackoverflow.com/questions/70271759/the-template-tag-doesnt-work-with-x-transition-in-alpine-js -->
+        <!-- TODO: Remover uso do código -->
+        <!-- <template x-if="!!taskIdOrUrl">
+          https://stackoverflow.com/questions/70271759/the-template-tag-doesnt-work-with-x-transition-in-alpine-js
           <label
             class="form-control"
             x-data="{ show: false }"
@@ -105,7 +107,7 @@
               <option value="i">Issue</option>
             </select>
           </label>
-        </template>
+        </template> -->
 
         <br class="hidden" />
 
@@ -157,10 +159,13 @@
             Ao preencher os campos, o nome da branch será exibido aqui
           </small>
         </p>
-        <p x-show="!!taskIdCommitPrefix" x-transition>
-          <b>Dica:</b> Você pode usar o Task ID em suas mensagens de commit, ex:
+        <p x-show="!!branchName" x-transition>
+          <b>Dica:</b> Para os Work Items do tipo TASK, BUG e IMPROVEMENT você
+          pode usá-los como prefixo das mensagens de commit, ex:
           <br />
-          <code><span x-text="taskIdCommitPrefix"></span>AAA BBB CCC</code>
+          <!-- TODO: Remover uso do código -->
+          <!-- <code><span x-text="taskIdCommitPrefix"></span>AAA BBB CCC</code> -->
+          <code>TASK 1111 - Minha mensagem</code>
 
           <button x-ref="btnCopyTaskIdCommitPrefix">
             <svg
@@ -220,6 +225,49 @@
         }
 
         return null;
+      }
+
+      /**
+       * @param {string} workItemTypeId
+       * @returns
+       */
+      function extractWorkItemTypeId(workItemTypeId) {
+        // `USER STORY 5226` ou `STORY 5226` ou `US 5226`
+        const regex = /(.*)\s(\d+)/;
+
+        const match = workItemTypeId.match(regex);
+        if (!match) {
+          return null;
+        }
+
+        const [, matchType, matchId] = match;
+
+        // TODO: Mover isso para um lugar adequado
+        let type = removeDuplicateSpaces(matchType).trim().toLowerCase();
+        switch (type) {
+          case "user story":
+          case "story":
+          case "us":
+            type = "story";
+            break;
+          default:
+            break;
+        }
+
+        const id = matchId.trim();
+
+        return {
+          type,
+          id,
+        };
+      }
+
+      /**
+       * Remove os espaços duplicados de uma string
+       * @param {string} v
+       */
+      function removeDuplicateSpaces(v) {
+        return v.replace(/\s+/g, " ");
       }
 
       /**
@@ -283,9 +331,15 @@
             return null;
           }
 
-          const taskId = extractTaskId(v);
-          if (!taskId) {
-            return "O texto informado não contém um Task ID válido";
+          const workItemTypeId = extractWorkItemTypeId(v);
+          if (!workItemTypeId) {
+            return "O texto informado não contém um Work Item com tipo e ID";
+          }
+
+          // TODO: Mover isso para um lugar adequado
+          const commonWorkItemTypes = ["story", "issue", "refinement"];
+          if (!commonWorkItemTypes.includes(workItemTypeId.type)) {
+            return `O tipo de Work Item '${workItemTypeId.type}' não é comum`;
           }
 
           return null;
@@ -297,18 +351,17 @@
         },
 
         get branchName() {
-          const wipBranch = this.wipBranch ? "WIP/" : "";
-          const branchType = this.branchType ? `${this.branchType}/` : "";
-
-          const taskId = extractTaskId(this.taskIdOrUrl);
-          const taskIdOrUrl = taskId ? `${taskId}-` : "";
-          const taskType = !!taskId && this.taskType ? `${this.taskType}-` : "";
+          const workItemTypeId = extractWorkItemTypeId(this.taskIdOrUrl);
+          const branchType = workItemTypeId?.type
+            ? `${kebabCase(workItemTypeId.type)}/`
+            : "";
+          const taskIdOrUrl = workItemTypeId?.id ? `${workItemTypeId.id}-` : "";
 
           const branchDescription = this.branchDescription
             ? kebabCase(this.branchDescription)
             : "";
 
-          return `${wipBranch}${branchType}${taskType}${taskIdOrUrl}${branchDescription}`;
+          return `${branchType}${taskIdOrUrl}${branchDescription}`;
         },
 
         get taskIdCommitPrefix() {
