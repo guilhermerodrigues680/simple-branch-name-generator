@@ -250,6 +250,13 @@
           case "us":
             type = "story";
             break;
+          case "bug":
+            type = "bugfix";
+            break;
+          // TODO: Melhorar, pois é um tipo de item que não existe
+          case "hot":
+            type = "hotfix";
+            break;
           default:
             break;
         }
@@ -337,7 +344,14 @@
           }
 
           // TODO: Mover isso para um lugar adequado
-          const commonWorkItemTypes = ["story", "issue", "refinement"];
+          const commonWorkItemTypes = [
+            "feature",
+            "issue",
+            "story",
+            "refinement",
+            "bugfix", // - BUG
+            "hotfix", // - BUG PRD (// TODO: Melhorar, pois é um tipo de item que não existe)
+          ];
           if (!commonWorkItemTypes.includes(workItemTypeId.type)) {
             return `O tipo de Work Item '${workItemTypeId.type}' não é comum`;
           }
